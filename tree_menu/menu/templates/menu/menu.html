@@ -1,0 +1,94 @@
+{% load tree_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Меню</title>
+    <style>
+        body {
+     font-size: 30px;
+     font-weight: 400;
+     }
+
+     ul li {
+     list-style: none;
+     }
+
+     .hide::before {
+     content: "+";
+     }
+
+     .show::before {
+     content: "-";
+     }
+    </style>
+
+</head>
+
+<body>
+
+{% comment %}
+Далее используются созданные в базе записи для меню 'main_menu'
+в коде javascript используются символы '+' и '-', для показа
+раскрыт ли выбранный пункт. При раскрытии пункта нижние вложенные
+раскрываются на один уровень вниз, все что наверху раскрывается полностью.
+{% endcomment %}
+
+{% draw_menu 'main_menu' %}
+
+
+<script>
+    function hide_show(event) {
+         if (event.target.tagName != 'SPAN') return;
+
+         const childrenList = event.target.parentNode.querySelector('ul');
+         if (!childrenList) return;
+         childrenList.hidden = !childrenList.hidden;
+
+         const elements = document.querySelectorAll('ul');
+         const el = document.querySelectorAll('span');
+         const index = [].indexOf.call(elements, childrenList);
+
+         for (let i = 0; i < index; i++) {
+            if (!childrenList.hidden){
+              elements[i].hidden = false;
+              el[i].classList.add('show');
+              el[i].classList.remove('hide');
+              }
+         }
+
+         if (childrenList.hidden) {
+            event.target.classList.add('hide');
+            event.target.classList.remove('show');
+         }
+         else {
+            event.target.classList.add('show');
+            event.target.classList.remove('hide');
+         }
+
+   }
+
+   const list = document.querySelector('ul');
+   for (let li of list.querySelectorAll('li')) {
+       if (li.children.length > 1)
+       {
+       const span = document.createElement('span');
+       span.classList.add('hide');
+       li.prepend(span);
+       span.append(span.nextSibling);
+       }
+    }
+
+    list.id = 'main_menu';
+
+   main_menu.addEventListener('click', hide_show);
+
+   const elements = document.querySelectorAll('ul');
+
+   for (let i = 1; i < elements.length; i++) {
+      elements[i].hidden=true;
+    }
+</script>
+
+</body>
+</html>
