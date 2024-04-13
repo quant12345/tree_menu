@@ -7,22 +7,33 @@ register = template.Library()
 
 @register.simple_tag
 def draw_menu(menu_name):
-    menu_items = MenuItem.objects.filter(name=menu_name).select_related('parent')
+    data = MenuItem.objects.values('name', 'named_url', 'parent__name')
 
-    return mark_safe(generate_menu(menu_items))
+    return mark_safe(generate_main(menu_name, data))
 
 
-def generate_menu(menu_items):
+def generate_inside_main(name, data):
     generate_html = '<ul>'
-    for item in menu_items:
-        generate_html += '<li>'
-        if item.named_url:
-            generate_html += f'<a href="{item.named_url}">{item.name}</a>'
-        else:
-            generate_html += item.name
-        if item.children.exists():
-            generate_html += generate_menu(item.children.all())
-        generate_html += '</li>'
-    generate_html += '</ul>'
+    for entry in data:
+        if name == entry['parent__name']:
+            generate_html += '<li>'
+            generate_html += f'<a href="{entry["named_url"]}">{entry["name"]}</a>'
+            resalt_recursion = generate_inside_main(entry['name'], data)
+            ul_end = '</ul>'
+            if len(resalt_recursion) <= 4:
+                ul_end = ''
+                resalt_recursion = ''
+            generate_html += resalt_recursion
+            generate_html += '</li>' + ul_end
+    return generate_html
 
+
+def generate_main(name, data):
+    inside_main = generate_inside_main(name, data)
+    first_url = [i['named_url'] for i in data if name == i['name']]
+    link = f'<a href="{first_url[0]}">{name}</a>'
+    generate_html = '<ul><li>'
+    generate_html += link
+    generate_html += inside_main
+    generate_html += '</li></ul>'
     return generate_html
