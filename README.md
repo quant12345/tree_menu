@@ -35,7 +35,7 @@ python manage.py createsuperuser
 ```
 python manage.py runserver
 ```
-7. В админ панели создайте записи(пункты). Пример ниже, после гиф анимации.
+7. В админ панели создайте записи(пункты), если это необходимо(в проекте уже есть записи в файле db.sqlite3). Пример ниже, после гиф анимации.
 ![](https://github.com/quant12345/tree_menu/blob/master/imgs/display.gif)
 ![](https://github.com/quant12345/tree_menu/blob/master/imgs/database.jpg)
 
